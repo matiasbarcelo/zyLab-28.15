@@ -1,23 +1,135 @@
-
 #include <iostream>
+#include <string>
 #include "PlaylistNode.h"
+
 using namespace std;
 
 void PrintMenu(const string playlistTitle) {
-   cout << playlistTitle << " PLAYLIST MENU\na - Add song\nd - Remove song\nc - Change position of song\ns - Output songs by specific artist\nt - Output total time of playlist (in seconds)\no - Output full playlist\nq - Quit" << endl;
+   cout << playlistTitle << " PLAYLIST MENU" << endl;
+   cout << "a - Add song" << endl;
+   cout << "d - Remove song" << endl;
+   cout << "c - Change position of song" << endl;
+   cout << "s - Output songs by specific artist" << endl;
+   cout << "t - Output total time of playlist (in seconds)" << endl;
+   cout << "o - Output full playlist" << endl;
+   cout << "q - Quit" << endl;
 }
 
-PlaylistNode* ExecuteMenu(char option, string playlistTitle, PlaylistNode* headNode) {
+void ExecuteMenu(char option, string playlistTitle, PlaylistNode* headNode) {
+   if (option == 'o'){
+      cout << playlistTitle << " - OUTPUT FULL PLAYLIST" << endl;
+      if(headNode->GetNext() == nullptr){
+         cout << "Playlist is empty" << endl;
+      }
+      int count = 1;
+      while (headNode->GetNext() != nullptr){
+         cout << count << "." << endl;
+         cout << "Unique ID: " << headNode->GetNext()->GetID() << endl;
+         cout << "Song Name: " << headNode->GetNext()->GetSongName() << endl;
+         cout << "Artist Name: " << headNode->GetNext()->GetArtistName() << endl;
+         cout << "Song Length (in seconds): " << headNode->GetNext()->GetSongLength() << endl;
+         count++;
+         headNode = headNode->GetNext();
+      }
+   }
+   else if (option == 'd'){
+      string uniqueID;
+      string songName;
+      cout << "REMOVE SONG" << endl;
+      cout << "Enter song unique ID: " << endl;
+      getline(cin, uniqueID);
+      cout << uniqueID << endl;
+      while (headNode -> GetNext() != nullptr){
+         if (headNode->GetNext()->GetID() == uniqueID){
+            PlaylistNode* temp = headNode->GetNext()->GetNext();
+            songName = headNode->GetNext()->GetSongName();
+            delete headNode->GetNext();
+            headNode->SetNext(temp);
+            cout << "\"" << songName << "\" removed." << endl;
+         }
+         headNode = headNode->GetNext();
+      }
+   }
+   else if (option == 's'){
+      string artistName;
+      int count = 1;
+      cout << "OUPUT NAME BY SPECIFIC ARTIST" << endl;
+      cout << "Enter artist's name:" << endl;
+      getline(cin, artistName);
+      cout << artistName << endl;
+      while (headNode -> GetNext() != nullptr){
+         if (headNode->GetNext()->GetArtistName() == artistName){
+            cout << count << "." << endl;
+            cout << "Unique ID: " << headNode->GetNext()->GetID() << endl;
+            cout << "Song Name: " << headNode->GetNext()->GetSongName() << endl;
+            cout << "Artist Name: " << headNode->GetNext()->GetArtistName() << endl;
+            cout << "Song Length (in seconds): " << headNode->GetNext()->GetSongLength() << endl;
+         }
+         count++;
+         headNode = headNode->GetNext();
+      }
+   }
+   else if (option == 't'){
+      cout << "OUTPUT TOTAL TIME OF PLAYLIST (IN SECONDS)" << endl;
+      int totalTime = 0;
+      while (headNode -> GetNext() != nullptr) {
+         totalTime += headNode -> GetNext() -> GetSongLength();
+         headNode = headNode->GetNext();
+      }
+      cout << "Total time: " << totalTime << " seconds" << endl;
+   }
+   else if (option == 'a'){
+      cout << "ADD SONG" << endl;
+      string uniqueID;
+      string songName;
+      string artistName;
+      string songLengthString;
+      int songLength;
       
+      cout << "Enter song's unique ID: ";
+      getline(cin, uniqueID);
+      cout << uniqueID << endl;
+      cout << "Enter song's name: ";
+      getline(cin,songName);
+      cout << songName << endl;
+      cout << "Enter artist's name: ";
+      getline(cin,artistName);
+      cout << artistName << endl;
+      cout << "Enter song's length (in seconds): ";
+      getline(cin,songLengthString);
+      songLength = stoi(songLengthString);
+      cout << songLength << endl;
+      
+      PlaylistNode* newSong = new PlaylistNode(uniqueID, songName, artistName, songLength);
+      while (headNode->GetNext() != nullptr){
+         headNode = headNode->GetNext();
+      }
+      headNode->InsertAfter(newSong);
+   }
+   cout << endl;
 }
 
 int main() {
+   /* Type your code here */
+   PlaylistNode* head = new PlaylistNode();
    string playlistTitle;
+   string choice;
    
-   cout << "Enter playlist's title: " << endl;
-   cin >> playlistTitle;
-   
+   cout << "Enter playlist's title:" << endl << endl;
+   getline(cin, playlistTitle);
    PrintMenu(playlistTitle);
+   cout << endl << "Choose an option: ";
+   getline(cin, choice);
+   cout << choice << endl;
+   ExecuteMenu(choice[0], playlistTitle, head);
+   
+   while(choice != "q"){
+      PrintMenu(playlistTitle);
+      cout << endl << "Choose an option: ";
+      getline(cin, choice);
+      cout << choice << endl;
+      ExecuteMenu(choice[0], playlistTitle, head);
+   }
    
    return 0;
 }
